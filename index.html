@@ -506,7 +506,7 @@
               <input id="stay-nightly-subtotal" type="hidden" name="Nightly subtotal" />
               <input id="stay-cleaning-fee" type="hidden" name="Cleaning fee" />
               <input id="stay-estimated-total" type="hidden" name="Estimated total" />
-              <input id="stay-deposit-due" type="hidden" name="Deposit due after approval" />
+              
               <input id="stay-cancellation-term" type="hidden" name="Cancellation term" />
               <div class="form-honey" aria-hidden="true">
                 <label for="stay-honey">Leave this field empty</label>
@@ -525,7 +525,7 @@
                   <p>By requesting and, if approved, booking a stay at Solitude Manor, the requesting guest agrees that:</p>
                   <ol>
                     <li>The stay has a one-night minimum and includes a $175 cleaning fee.</li>
-                    <li>After the owner approves the request, a $100 reservation deposit is due through the owner’s Stripe payment link. Cancellation is free until 24 hours before check-in. If the guest cancels within 24 hours of check-in, the $100 deposit is forfeited.</li>
+                    <li>After the owner approves the request, your reservation is confirmed. Cancellation is free until 24 hours before check-in.</li>
                     <li>Quiet hours begin at 8:00 PM. Sound and outdoor activity must be reduced accordingly.</li>
                     <li>Strictly non-smoking property: no smoking of any kind—including cigarettes, cigars, pipes, vapes/e-cigarettes, and cannabis—is permitted inside the house or anywhere on the property grounds. Violation may result in immediate termination of the stay without refund plus additional deep-cleaning charges.</li>
                     <li>No pets of any kind are allowed on the property at any time, except documented service animals as required by law. Violation may result in immediate termination without refund plus additional cleaning charges.</li>
@@ -584,7 +584,7 @@
       <div class="steps">
         <article class="step"><span class="step-num">01</span><h3>Check your dates</h3><p>The calendar screens your stay against owner-blocked nights and calculates the current date-based rate.</p></article>
         <article class="step"><span class="step-num">02</span><h3>Send a request</h3><p>Share your contact details and trip notes. Your reservation is held only after the owner approves it.</p></article>
-        <article class="step"><span class="step-num">03</span><h3>Pay the $100 deposit</h3><p>After approval, pay the $100 reservation deposit on the owner’s secure Stripe-hosted checkout page. It is non-refundable only when you cancel within 24 hours of check-in.</p><a class="button" id="stripe-link" href="https://buy.stripe.com/bJe8wQ99J6P03IJ1hMgbm00" target="_blank" rel="noopener">Pay $100 deposit after approval</a><p class="config-note" id="stripe-config-note">Use this link only after the owner approves your booking request.</p></article>
+        <article class="step"><span class="step-num">03</span><h3>Get confirmed</h3><p>After approval, the owner confirms your reservation by email with arrival details. Cancellation is free until 24 hours before check-in.</p></article>
       </div>
     </section>
 
@@ -730,10 +730,10 @@
        Add dates as YYYY-MM-DD. A blocked date cannot be selected for a stay
        or event. Nightly overrides apply to the night beginning on that date;
        values are automatically limited to the configured pricing bounds.
-       The owner email and Stripe Payment Link are configured below. */
+       The owner email is configured below. */
     const CONFIG = {
       ownerEmail: "solitudemanor@yahoo.com",
-      stripePaymentLink: "https://buy.stripe.com/bJe8wQ99J6P03IJ1hMgbm00",
+      
       blockedDates: [],
       nightlyRateOverrides: {}
     };
@@ -741,7 +741,7 @@
     const BASE_RATE = 250;
     const MAX_RATE = 1200;
     const STAY_CLEANING = 150;
-    const STAY_DEPOSIT = 100;
+    
     const EVENT_RATE = 2800;
     const EVENT_CLEANING = 250;
     const EVENT_DEPOSIT = 1000;
@@ -969,8 +969,8 @@
       $("#stay-nightly-subtotal").value = money.format(quote.subtotal);
       $("#stay-cleaning-fee").value = money.format(STAY_CLEANING);
       $("#stay-estimated-total").value = money.format(quote.total);
-      $("#stay-deposit-due").value = money.format(STAY_DEPOSIT);
-      $("#stay-cancellation-term").value = "refundable until 24 hours before check-in; non-refundable within 24 hours";
+      
+      $("#stay-cancellation-term").value = "free cancellation until 24 hours before check-in";
     });
 
     $("#event-date").addEventListener("change", () => {
@@ -1034,16 +1034,7 @@
       $("#event-config-note").textContent = "The owner’s request email is not connected yet. Until it is added, this button copies a complete inquiry for you to send directly.";
     }
 
-    const stripeLink = $("#stripe-link");
-    stripeLink.addEventListener("click", (event) => {
-      if (stripeLink.getAttribute("aria-disabled") === "true") event.preventDefault();
-    });
-    if (/^https:\/\//.test(CONFIG.stripePaymentLink)) {
-      stripeLink.href = CONFIG.stripePaymentLink;
-      stripeLink.setAttribute("aria-disabled", "false");
-      stripeLink.textContent = "Pay $100 deposit after approval";
-      $("#stripe-config-note").textContent = "Use this link only after the owner approves your booking request.";
-    }
+    
 
     $("#contact-form").addEventListener("submit", async (event) => {
       event.preventDefault();
