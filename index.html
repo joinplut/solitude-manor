@@ -730,6 +730,7 @@
        Add dates as YYYY-MM-DD. A blocked date cannot be selected for a stay
        or event. Nightly overrides apply to the night beginning on that date;
        values are automatically limited to the configured pricing bounds.
+       Seasonal base rates live in SEASON_RATES below — edit any month there.
        The owner email is configured below. */
     const CONFIG = {
       ownerEmail: "solitudemanor@yahoo.com",
@@ -739,12 +740,31 @@
     };
 
     const BASE_RATE = 250;
-    const MAX_RATE = 1200;
-    const STAY_CLEANING = 150;
-    
-    const EVENT_RATE = 2800;
-    const EVENT_CLEANING = 250;
+    const MAX_RATE = 750;
+    const STAY_CLEANING = 175;
+
+    const EVENT_RATE = 2500;
+    const EVENT_CLEANING = 300;
     const EVENT_DEPOSIT = 1000;
+
+    /* SEASONAL NIGHTLY RATES — [weekday, weekend] per month, from comparable
+       3bd pool homes around Fairburn / south Atlanta (researched Oct 2026).
+       Weekend = Friday and Saturday nights. Per-date overrides in
+       CONFIG.nightlyRateOverrides still take precedence. */
+    const SEASON_RATES = [
+      [250, 300], // Jan — low season
+      [250, 300], // Feb — low season
+      [275, 325], // Mar — spring ramp
+      [300, 350], // Apr — Renaissance Festival
+      [325, 375], // May — Ren Fest + Memorial Day
+      [350, 425], // Jun — peak pool season
+      [375, 450], // Jul — peak pool season
+      [350, 425], // Aug — peak pool season
+      [325, 375], // Sep — late summer
+      [275, 325], // Oct — fall shoulder
+      [250, 300], // Nov — low season
+      [275, 325], // Dec — holidays
+    ];
     const DAY_MS = 86400000;
 
     const $ = (selector) => document.querySelector(selector);
@@ -785,7 +805,11 @@
 
     function rateFor(date) {
       const proposed = Number(CONFIG.nightlyRateOverrides[date]);
-      return Number.isFinite(proposed) ? Math.min(MAX_RATE, Math.max(BASE_RATE, proposed)) : BASE_RATE;
+      if (Number.isFinite(proposed)) return Math.min(MAX_RATE, Math.max(BASE_RATE, proposed));
+      const d = parseISO(date);
+      if (!d) return BASE_RATE;
+      const weekend = d.getUTCDay() === 5 || d.getUTCDay() === 6;
+      return SEASON_RATES[d.getUTCMonth()][weekend ? 1 : 0];
     }
 
     function stayQuote(startISO, endISO) {
